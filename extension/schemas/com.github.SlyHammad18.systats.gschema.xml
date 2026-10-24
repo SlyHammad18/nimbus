@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SyStats gsettings schema.
+  Task 01 ships this empty but strictly valid; task 08 populates it per
+  DESIGN.md section 9.
+-->
+<schemalist>
+  <schema
+    id="com.github.SlyHammad18.systats"
+    path="/com/github/SlyHammad18/systats/"
+  >
+  </schema>
+</schemalist>

@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          pipx install meson ninja
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Lint
+        run: |
+          npm install
+          npm run lint
+
+      - name: Configure and build
+        run: |
+          meson setup builddir
+          meson compile -C builddir
+
+      - name: Test (schema compiles)
+        run: meson test -C builddir
+
+      - name: Validate extension zip
+        run: |
+          test -s builddir/extension/systats.zip
+          unzip -l builddir/extension/systats.zip | grep 'src/extension.js'

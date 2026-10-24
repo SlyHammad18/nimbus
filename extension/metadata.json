@@ -1,0 +1,8 @@
+{
+    "uuid": "systats@SlyHammad18.github.com",
+    "name": "SyStats",
+    "description": "Customizable system statistics for the GNOME panel: CPU, GPU, RAM and VRAM, storage I/O, network, and temperatures, with a popup dashboard and an always-on-top overlay.",
+    "shell-version": ["45", "46", "47", "48", "49"],
+    "url": "https://github.com/SlyHammad18/nimbus",
+    "version": 1
+}
