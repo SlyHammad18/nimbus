@@ -1,4 +1,4 @@
-# AGENTS.md — Working Rules for SyStats
+# AGENTS.md — Working Rules for Nimbus
 
 This file is the contract for any agent (or human) doing work in this repo.
 Read `DESIGN.md` first, then this file. Never skip either.

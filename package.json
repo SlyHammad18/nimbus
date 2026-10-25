@@ -1,12 +1,12 @@
 {
-    "name": "systats",
+    "name": "nimbus",
     "version": "0.1.0",
     "private": true,
-    "description": "Development tooling for the SyStats GNOME Shell extension (lint and CI checks; the extension itself does not ship through npm).",
+    "description": "Development tooling for the Nimbus GNOME Shell extension (lint and CI checks; the extension itself does not ship through npm).",
     "type": "module",
     "scripts": {
         "lint": "eslint .",
-        "zip": "python3 scripts/make-zip.py build/extension/systats.zip extension"
+        "zip": "python3 scripts/make-zip.py build/extension/nimbus.zip extension"
     },
     "devDependencies": {
         "eslint": "^10.13.0"

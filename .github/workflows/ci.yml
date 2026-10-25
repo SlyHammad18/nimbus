@@ -27,13 +27,13 @@ jobs:
 
       - name: Configure and build
         run: |
-          meson setup builddir
-          meson compile -C builddir
+          meson setup build
+          meson compile -C build
 
       - name: Test (schema compiles)
-        run: meson test -C builddir
+        run: meson test -C build
 
       - name: Validate extension zip
         run: |
-          test -s builddir/extension/systats.zip
-          unzip -l builddir/extension/systats.zip | grep 'src/extension.js'
+          test -s build/extension/nimbus.zip
+          unzip -l build/extension/nimbus.zip | grep 'src/extension.js'

@@ -30,7 +30,7 @@ CI runs green on an empty extension.
 - Run `ninja -C build` in a terminal; it finishes with no errors and produces
   the extension zip in `build/extension/`.
 - Run `eslint extension/src/extension.js`; it prints nothing (clean).
-- Open `build/extension/systats.zip` (or equivalent) and confirm it exists and
+- Open `build/extension/nimbus.zip` (or equivalent) and confirm it exists and
   is non-empty.
 
 ### Report
@@ -38,9 +38,9 @@ CI runs green on an empty extension.
 - **Date:** 2026-10-25
 - **Status:** done
 - **What was done:**
-  - Meson project at root + `extension/` subproject: builds the gschema dry-run test and a custom target producing `builddir/extension/systats.zip` (EGO layout: `metadata.json`, `src/extension.js`, `schemas/...`).
-  - Minimal ESM entry `extension/src/extension.js` (clean `init`/`enable`/`disable`), `metadata.json` for GNOME 45-49 with uuid `systats@SlyHammad18.github.com`.
-  - Empty-but-strict gschema `com.github.SlyHammad18.systats` wired into `meson test`.
+  - Meson project at root + `extension/` subproject: builds the gschema dry-run test and a custom target producing `builddir/extension/nimbus.zip` (EGO layout: `metadata.json`, `src/extension.js`, `schemas/...`).
+  - Minimal ESM entry `extension/src/extension.js` (clean `init`/`enable`/`disable`), `metadata.json` for GNOME 45-49 with uuid `nimbus@SlyHammad18.github.com`.
+  - Empty-but-strict gschema `com.github.SlyHammad18.nimbus` wired into `meson test`.
   - ESLint flat config (`eslint.config.mjs`) encoding the GNOME review hard rules + legacy-API bans; npm `lint` script; CI workflow `.github/workflows/ci.yml` (pipx meson/ninja, node 24, lint, build, test, zip validation); `.gitignore`; README stub.
 - **Deviations from plan:**
   - `eslint-plugin-gjs` 1.0.4 is incompatible with ESLint 9+ (`eslint/lib/ast-utils` no longer exported). Dropped the plugin and reproduced its mechanically-checkable gjs bans via core rules (`no-restricted-imports`/`no-restricted-globals` for `imports`, `Lang`, `Mainloop`) + review rules. Noted for later tasks: reevaluate if the plugin updates.
@@ -51,10 +51,10 @@ CI runs green on an empty extension.
   - `meson test -C builddir` -> pass (1/1 gschema-compiles)
   - `npx eslint .` -> clean, no output
   - `gjs -m extension/src/extension.js` -> imports clean (no-op entry)
-  - `unzip -l builddir/extension/systats.zip` -> exactly metadata.json, schemas xml, src/extension.js (meson.build excluded from the zip)
+  - `unzip -l builddir/extension/nimbus.zip` -> exactly metadata.json, schemas xml, src/extension.js (meson.build excluded from the zip)
 - **Manual steps left for user:**
   - Push to GitHub (or run CI) to see the workflow go green: the Actions run itself cannot be verified from this environment. Local equivalents of every CI step already pass.
-  - `unzip builddir/extension/systats.zip` locally to eyeball the contents (contents verified programmatically above).
+  - `unzip builddir/extension/nimbus.zip` locally to eyeball the contents (contents verified programmatically above).
 - **Known issues / follow-ups:**
   - `build_always_stale: true` on the zip target means every ninja run re-zips (cheap; avoids staleness bugs until we add declared inputs).
   - GitHub Actions uses pipx for meson/ninja; if the runner image changes, revisit.

@@ -1,4 +1,4 @@
-# SyStats — System Statistics for GNOME Shell
+# Nimbus — System Statistics for GNOME Shell
 
 **Version:** 0.1 (Design Document)
 **Status:** Draft
@@ -16,7 +16,7 @@ Furthermore:
 - **GPU monitoring on GNU+Linux** is inconsistent — NVIDIA requires NVML/nvidia-smi parsing, AMD/Intel rely on differing sysfs/hwmon layouts — so almost no panel tool does it well.
 - **Always-on-top workload overlays** (the kind power users love while gaming/compiling/rendering) usually require a separate app running as an X11 overlay, which breaks under Wayland.
 
-**SyStats** solves this with a single GNOME Shell extension that:
+**Nimbus** solves this with a single GNOME Shell extension that:
 
 1. Renders a compact, fully customizable stats strip in the GNOME panel (clock %, temps, memory, network up/down, etc. — matching the reference aesthetic).
 2. Expands into a rich animated dashboard popup on hover/click — per-core graphs, GPU stats, storage I/O, network history.
@@ -123,12 +123,12 @@ Furthermore:
 
 | ID | Requirement |
 |----|-------------|
-| S1 | Schema-backed `gsettings` (`com.github.<user>.systats`). Settings UI = libadwaita `PreferencesDialog` (after 45, or `Adw.PreferencesWindow`). |
+| S1 | Schema-backed `gsettings` (`com.github.<user>.nimbus`). Settings UI = libadwaita `PreferencesDialog` (after 45, or `Adw.PreferencesWindow`). |
 | S2 | **Text formatter:** per-module template with tokens, e.g. `"{icon}{cpu:2}"` or `"🔊 {vram_used:1} / {vram_total:1} ({vram_used_pct})"`. Live preview in settings. |
 | S3 | Global refresh interval slider (default 1000ms; popup-local hover refresh down to 500ms). Per-module override supported. |
 | S4 | Per-metric thresholds: e.g. CPU warn 60/crit 85 → 3-state color states (`.normal` / `.warn` / `.crit`) with user-settable colors, and optional text/alpha changes instead of pure color (monochrome-safe). |
 | S5 | Unit system: KiB/MiB/GiB vs KB/MB/GB vs auto; speeds in `B/s` vs `b/s`; temperature °C / °F. |
-| S6 | Style presets (SVG sticker catalog) + custom icon packs (`~/.local/share/systats/icons/`). |
+| S6 | Style presets (SVG sticker catalog) + custom icon packs (`~/.local/share/nimbus/icons/`). |
 | S7 | Colors: per-metric line colors for sparklines; background style (none/soft/pill) for panel modules; popup background opacity + blur (where allowed). |
 | S8 | Layout: number of digits, padding, separators between modules (`│`, `·`, custom unicode, or none); better spacing for RTL locales. |
 | S9 | Positioning: panel slot (left/center/right, sub-index); overlay window position/size/opacity/click-through; popup width. |
@@ -150,7 +150,7 @@ Furthermore:
 | N5 | Icon-style: monochrome by default, respecting GNOME wish for no color-in-icon misuse; works on dark and light panel. |
 | N6 | i18n-ready: all strings via `Gettext`, POT templated; templates tokens locale-safe. |
 | N7 | Works under Wayland (required) and X11 (best-effort, overlay uses different positioned-window mode). |
-| N8 | No polling blocking Main loop: all file reads via async `Gio.File.load_contents_async` or dedicated worker `GLib.SimpleAsyncResult`; NVML calls proxied via small C `systats-nvml` helper only if NVML outside GIO usable, else JSON `nvidia-smi` reader. |
+| N8 | No polling blocking Main loop: all file reads via async `Gio.File.load_contents_async` or dedicated worker `GLib.SimpleAsyncResult`; NVML calls proxied via small C `nimbus-nvml` helper only if NVML outside GIO usable, else JSON `nvidia-smi` reader. |
 | N9 | Full review-cleanliness: no eval, no documentObject shell-out in extension code, strict ESM, commented entry per gjs.guide. |
 | N10 | Data-source failures degrade independently (fault-test: CPU fails but network still legal). |
 
@@ -171,7 +171,7 @@ Furthermore:
 | Read/write rates | `/proc/diskstats` deltas | `GTop fsusage` (has "total" not deltas) | `/proc/diskstats` is delta-ready. |
 | Network | `/proc/net/dev` + `NetworkManager` client | `GTop netload` | easiest per-Iface and auto-select default route via NM `ActiveConnection`. |
 | Temps/Fans | `/sys/class/hwmon` scanner | `GTop`'s `Sensors` if GI present | hwmon is universal; name labels from `*_label`. |
-| NVIDIA GPU | **NVML via a 60-line C helper daemon** (`systats-nvml`) writing a small mmap'd/IPC JSON at `XDG_RUNTIME_HOME` | `nvidia-smi --query-gpu=... --format=csv,noheader` (subprocess 1s) | NVML via GJS directly is unreliable (C lib not GI); C helper is cleanest and cheapest; falls back to subprocess when not compiled. |
+| NVIDIA GPU | **NVML via a 60-line C helper daemon** (`nimbus-nvml`) writing a small mmap'd/IPC JSON at `XDG_RUNTIME_HOME` | `nvidia-smi --query-gpu=... --format=csv,noheader` (subprocess 1s) | NVML via GJS directly is unreliable (C lib not GI); C helper is cleanest and cheapest; falls back to subprocess when not compiled. |
 | AMD/Intel GPU | sysfs `drm` driver-specific nodes (`gpu_busy_percent`, `mem_info_vram_*` for AMD; `i915` engine stats, `fdinfo` for Intel) | none (show n/a) | documented strategy — see §7. |
 | NM hotspot/SSID | `org.freedesktop.NetworkManager` DBus (`GnomeNMClient`/GJS `<Teams>` `NM.Gnome` available) | gateway ping | robust SSID + strength network icons. |
 | Battery | `org.freedesktop.UPower` DBus | `/sys/class/power_supply` | rich metadata (W rate). |
@@ -192,7 +192,7 @@ Wayland forbids clients from self-positioning or reliably staying above fullscre
 
 GTK4 + libadwaita + (optional) `gtk4-layer-shell` lets us ship a sexy rounded, translucent, click-through-capable overlay identical to the reference mock. On X11 we use `gtk4-window-set-keep-above` instead.
 
-**Overlay process model:** a small independent GTK app (`systats-overlay`) shares no GJS; it subscribes to metrics via the same coordinator pattern duplicated in a shared pure-JS/C-free core (`packages/core` — see §8), or simply re-reads the same /proc/sysfs/NVML-IPC sources. Simpler and more robust than IPC to the extension, and gives us a working overlay even if the extension is disabled.
+**Overlay process model:** a small independent GTK app (`nimbus-overlay`) shares no GJS; it subscribes to metrics via the same coordinator pattern duplicated in a shared pure-JS/C-free core (`packages/core` — see §8), or simply re-reads the same /proc/sysfs/NVML-IPC sources. Simpler and more robust than IPC to the extension, and gives us a working overlay even if the extension is disabled.
 
 ### 5.4 Rendering choices in the popup
 
@@ -391,12 +391,12 @@ direct swap.
 │  PopupDashboard (St.BoxLayout, DrawingArea graphs)             │
 │  HoverPreview  (per-module mini dash)                          │
 │  SettingsUI    (prefs.js -> Adw.PreferencesWindow)             │
-│  OverlayLauncher (Gio.Subprocess -> systats-overlay bin)       │
+│  OverlayLauncher (Gio.Subprocess -> nimbus-overlay bin)       │
 └────────────────────────────────────────────────────────────────┘
                                 ▲
                                 │ reads same sources natively
 ┌───────────────────────────────┴────────────────────────────────┐
-│ companion: systats-overlay (GTK4 + libadwaita + gtk4-layer-    │
+│ companion: nimbus-overlay (GTK4 + libadwaita + gtk4-layer-    │
 │ shell) — Rust binary; native perf, small, no GJS in process    │
 │  - its own MetricsCoordinator (shared C headers not required — │
 │    reimplement cheap /proc/sysfs parsing natively)             │
@@ -406,7 +406,7 @@ direct swap.
                                 ▲
                                 │ JSON at 1 Hz flat-file sink
 ┌───────────────────────────────┴────────────────────────────────┐
-│ helper: systats-nvml-daemon (tiny C, optional)                 │
+│ helper: nimbus-nvml-daemon (tiny C, optional)                 │
 │  - NVML passes to small shared-mem ring → flat JSON line       │
 │  - used by both GJS extension & Rust overlay without libnvidia │
 │    dependencies in-process                                     │
@@ -456,7 +456,7 @@ export const cpuModule: ModuleSpec = {
 };
 ```
 
-Extensions hook the registry — users and future contributors can add a `~/.config/systats/modules/*.js` (loaded only with an explicit opt-in setting, off by default for security review compliance).
+Extensions hook the registry — users and future contributors can add a `~/.config/nimbus/modules/*.js` (loaded only with an explicit opt-in setting, off by default for security review compliance).
 
 ### 7.4 Data flow & tick model
 
@@ -470,7 +470,7 @@ Extensions hook the registry — users and future contributors can add a `~/.con
 ## 8. Project Structure
 
 ```
-SyStats/
+Nimbus/
 ├── DESIGN.md                      # this document
 ├── README.md                      # install + screenshots
 ├── LICENSE                        # GPL-3.0 (GNOME ecosystem norm for extensions)
@@ -479,7 +479,7 @@ SyStats/
 ├── extension/                     # GNOME Shell extension (GJS, ESM)
 │   ├── meson.build
 │   ├── metadata.json.in
-│   ├── org.gnome.Shell.Extensions.SyStats.xml.in  # gettext domain
+│   ├── org.gnome.Shell.Extensions.Nimbus.xml.in  # gettext domain
 │   ├── src/
 │   │   ├── extension.js           # ESM entry (init/fill/enable/disable)
 │   │   ├── prefs.js               # Adw settings window
@@ -510,7 +510,7 @@ SyStats/
 │   │       ├── history.js         # ring buffer
 │   │       └── async.js           # safe async file reads
 │   ├── schemas/
-│   │   └── com.github.<user>.systats.gschema.xml
+│   │   └── com.github.<user>.nimbus.gschema.xml
 │   └── data/
 │       └── stylesheet.css         # extension scoped css
 │
@@ -523,11 +523,11 @@ SyStats/
 │   │   ├── sources/{cpu.rs, mem.rs, disk.rs, net.rs, hwmon.rs, gpu_nvml.rs, …}
 │   │   ├── ui/{app.rs, module_strip.rs, charts.rs, theme.rs}
 │   │   └── config.rs               # reads gsettings via `gsettings get` OR cli flags
-│   └── res/systats-overlay.desktop / metainfo.xml
+│   └── res/nimbus-overlay.desktop / metainfo.xml
 │
 ├── helper/                        # optional C NVML ring-writer (60–120 LoC)
 │   ├── meson.build
-│   └── systats-nvml.c
+│   └── nimbus-nvml.c
 │
 ├── packaging/
 │   ├── PKGBUILD                   # Arch packaging
@@ -555,7 +555,7 @@ SyStats/
 6. `schemas/gschema.xml` + `prefs.js` — full settings surface.
 7. `gpu/` — NVML helper → smi fallback → drm sysfs; VRAM/temp/fan.
 8. `overlay/` Rust app (last — largest surface; useful only when extension is done).
-9. `helper/systats-nvml.c` — microdaemon.
+9. `helper/nimbus-nvml.c` — microdaemon.
 10. CI, packaging, `docs/`, EGO submission.
 
 ---
@@ -637,4 +637,4 @@ Settings UI maps this into: **General / Modules / Appearance / Sources / Overlay
 
 - GPL-3.0-or-later for extension + helper; MIT for the Rust overlay so it can be reused in some other project's widgets if desired.
 - EGO listing + GitHub Discussions; `docs/extending.md` as custom-module API reference.
-- Localization via GNOME Damned Lies convention (pot/ domain `org.gnome.Shell.Extensions.SyStats`).
+- Localization via GNOME Damned Lies convention (pot/ domain `org.gnome.Shell.Extensions.Nimbus`).

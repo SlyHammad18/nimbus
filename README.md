@@ -1,4 +1,4 @@
-# SyStats (project repo: nimbus)
+# Nimbus (project repo: nimbus)
 
 Customizable system statistics for the GNOME panel: CPU (per-core), GPU and
 VRAM, memory, storage space and I/O, network speeds, temperatures, and a
@@ -13,9 +13,9 @@ Early scaffold (design complete, tasks being built one at a time — see
 ## Build
 
 ```sh
-meson setup builddir
-meson compile -C builddir     # also produces builddir/extension/systats.zip
-meson test -C builddir
+meson setup build
+meson compile -C build       # also produces build/extension/nimbus.zip
+meson test -C build
 ```
 
 ## Lint

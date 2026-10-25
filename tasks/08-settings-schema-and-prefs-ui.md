@@ -12,7 +12,7 @@ preview, per-module visibility/order, refresh interval, units, separators.
 
 ## Steps
 
-1. `schemas/com.github.<user>.systats.gschema.xml` per §9.
+1. `schemas/com.github.<user>.nimbus.gschema.xml` per §9.
 2. `prefs.js` with Adw preference groups; drag-reorder module list; per-module
    surface toggles (panel/popup/overlay).
 3. Template engine in `util/format.js`: token parsing, digit formatting,

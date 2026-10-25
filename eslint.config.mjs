@@ -1,4 +1,4 @@
-// ESLint flat configuration for SyStats.
+// ESLint flat configuration for Nimbus.
 // Encodes the GNOME extension-review essentials (DESIGN.md N9, AGENTS.md §4)
 // by hand: eslint-plugin-gjs 1.0.4 deep-imports eslint/lib/ast-utils, which is
 // no longer exported in ESLint 9+, so the small set of gjs bans that are
@@ -23,7 +23,8 @@ export default [
       'no-var': 'error',
       'prefer-const': 'error',
       eqeqeq: 'error',
-      camelcase: 'error',
+      // GObject constructor properties are snake_case by design (gjs).
+      camelcase: ['error', {properties: 'never'}],
 
       // Legacy-API bans (replaces eslint-plugin-gjs/no-legacy-*)
       // imports/imports came from legacy GJS: caught at review time; the

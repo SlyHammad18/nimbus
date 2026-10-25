@@ -29,7 +29,7 @@ Full `meson test` green in CI including perf guard and screenshot diff.
 
 - Look at `docs/screenshots/` after this task: you see the three goldens
   (panel strip, open popup, overlay corner) matching what you've seen live.
-- `journalctl -f | grep -i systats` while toggling on/off 10-20 times shows
+- `journalctl -f | grep -i nimbus` while toggling on/off 10-20 times shows
   no warnings or errors beyond the first enable.
 - Run `meson test -C build`: summary reports all suites passing.
 

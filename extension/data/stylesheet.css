@@ -1,0 +1,20 @@
+/*
+ * Nimbus shell stylesheet.
+ *
+ * Token values come from DESIGN.md section 6.1 (the locked token table):
+ * text #e6e8ec, text-muted #9aa1ad, numeral #f2f4f7. The panel sits on the
+ * GNOME panel itself so module colors must read on any panel background:
+ * numerals are near-white with high contrast, and the placeholder label is
+ * muted. No module background, no rounded pill (the panel provides one).
+ *
+ * Z-order and spacing stay simple: this file exists for panel labels until
+ * task 05 generalizes the token system.
+ */
+
+.nimbus-panel-label {
+    font-family: 'Adwaita Mono', 'DejaVu Sans Mono', monospace;
+    font-size: 0.9em;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: rgb(242, 244, 247);
+}
