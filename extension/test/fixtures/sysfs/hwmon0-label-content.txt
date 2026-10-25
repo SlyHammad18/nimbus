@@ -1,0 +1,5 @@
+# name: "coretemp"
+# files: temp1_input temp1_label temp2_input
+coretemp
+# (fixture represents /sys/class/hwmon/hwmon0 name + labels; the test uses
+# inline strings and this stub documents where real cases come from)

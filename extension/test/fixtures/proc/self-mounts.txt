@@ -1,0 +1,9 @@
+# /etc/fstab comment line should be ignored by the mounts parser
+proc /proc proc defaults 0 0
+/dev/nvme0n1p2 / ext4 rw,relatime 0 1
+/dev/nvme0n1p2 /home ext4 rw,relatime 0 1
+/dev/sda1 /mnt/backup ext4 rw,relatime 0 1
+tmpfs /run/user/1000 tmpfs rw,nosuid,nodev,relatime,size=... 0 0
+/dev/sdb1 /mnt/backup ntfs-3g rw,relatime 0 0
+snapper-testfs /mnt/other indis-fs rw,relatime 0 0
+

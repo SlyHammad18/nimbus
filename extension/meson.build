@@ -22,3 +22,11 @@ test(
   find_program('glib-compile-schemas', required: true),
   args: ['--dry-run', '--strict', schemas_dir],
 )
+
+gjs_program = find_program('gjs', required: true)
+test(
+  'nimbus-units',
+  gjs_program,
+  args: ['-m', meson.project_source_root() / 'extension' / 'test' / 'run-tests.js'],
+  env: ['NIMBUS_TEST_ROOT=' + meson.project_source_root()],
+)
